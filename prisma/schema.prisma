@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model EmailRecipient {
+  id         Int      @id @default(autoincrement())
+  stage      Int
+  department String
+  type       String
+  name       String?
+  email      String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("Procurement")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Mine {
+  id        String   @id
+  name      String
+  nameKey   String   @unique
+  area      String?
+  company   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuctionNotification {
+  id         String            @id
+  number     String            @unique
+  date       DateTime
+  supplier   String
+  quantities OfferedQuantity[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model OfferedQuantity {
+  notificationId String
+  sno            Int
+  mine           String
+  coalType       String
+  grade          String
+  qty            Int
+  notification   AuctionNotification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, sno])
+}
